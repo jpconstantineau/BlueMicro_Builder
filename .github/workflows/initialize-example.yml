@@ -57,9 +57,9 @@ jobs:
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
       - name: create build workflow
         run: |
-          cp .github/workflow-templates/build.yml .github/workflows/build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.github/workflow-templates/build.yml
-          sed -i 's/ReplaceMeWithSketchName/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/' .github/workflows/build-{{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.github/workflow-templates/build.yml
-          sed -i 's/ReplaceMeWithCompileWith/${{ matrix.compile_with }}/' .github/workflows/build-{{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.github/workflow-templates/build.yml
+          cp .github/workflow-templates/build.yml .github/workflows/build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
+          sed -i 's/ReplaceMeWithSketchName/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/' .github/workflows/build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
+          sed -i 's/ReplaceMeWithCompileWith/${{ matrix.compile_with }}/' .github/workflows/build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           ls -l ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
       - name: remove BlueMicro_BLE repository
         run: |
