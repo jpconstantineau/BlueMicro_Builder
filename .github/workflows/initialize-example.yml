@@ -64,5 +64,6 @@ jobs:
           ls -l
           git config --global user.name 'gh-actions'
           git config --global user.email 'gh-actions@noreply.github.com'
-          git commit -am "Initialized using GitHub Actions"
+          git add ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
+          git commit -m "Initialized using GitHub Actions"
           git push
