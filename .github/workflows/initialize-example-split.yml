@@ -36,6 +36,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN  }}
+      - name: update from last run
+        run: git pull
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
