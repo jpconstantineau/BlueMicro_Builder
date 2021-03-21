@@ -58,3 +58,7 @@ jobs:
       - name: check back in the changes to this repo
         run: |
           ls -l
+          git config --global user.name 'gh-actions'
+          git config --global user.email 'gh-actions@noreply.github.com'
+          git commit -am "Initialized using GitHub Actions"
+          git push
