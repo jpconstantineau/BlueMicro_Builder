@@ -10,7 +10,8 @@ jobs:
   initialize-firmware:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false   
+      fail-fast: false 
+      max-parallel: 1  
       matrix:
         # Replace the following with the keyboard you want to setup.  
         # Only 1 keyboard is supported.  For more keyboards, copy and rename this file.
@@ -50,7 +51,7 @@ jobs:
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
       - name: create build workflow
         run: |
-          ls -l
+          ls -l ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
       - name: remove BlueMicro_BLE repository
         run: |
           rm -r BlueMicro_BLE
