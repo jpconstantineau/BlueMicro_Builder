@@ -32,6 +32,10 @@ jobs:
 
     # you shouldn't need to edit anything below
     steps:
+      - name: checkout builder repo
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN  }}
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
