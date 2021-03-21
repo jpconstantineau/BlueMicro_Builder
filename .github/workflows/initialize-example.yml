@@ -34,11 +34,9 @@ jobs:
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
-
       - name: create firmware folder
         run: |
           mkdir ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-
       - name: copy main firmware files
         run: |
           cp BlueMicro_BLE/firmware/*.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
@@ -50,15 +48,12 @@ jobs:
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-
       - name: create build workflow
         run: |
           ls -l
-
       - name: remove BlueMicro_BLE repository
         run: |
           rm -r BlueMicro_BLE
-
       - name: check back in the changes to this repo
         run: |
           ls -l
