@@ -43,11 +43,11 @@ jobs:
           cp BlueMicro_BLE/firmware/*.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/firmware.ino ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.ino
       - name: copy board specific files
-        run |
+        run: |
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
       - name: create build workflow
         run: |
           ls -l
