@@ -1,7 +1,7 @@
 # Use this workflow to initialize your repository with the fimware you need for your keyboard
 # if you have multiple keyboards, you need to have 1 copy of this file per keyboard
 # rename the name below so that you can see the different keyboards in your github actions
-name: initialize-split
+name: initialize-ErgoTravel
 
 # You will need to manually trigger this workflow
 on:  ['workflow_dispatch']
