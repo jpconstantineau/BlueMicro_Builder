@@ -1,12 +1,12 @@
 # BlueMicro_Builder
-Initializes and Builds your own BlueMicro_BLE firmware
+Initializes and Builds your own BlueMicro_BLE firmware.
 
 - Fork the repository
 - Make sure that github actions is enabled
   - Go to settings (of your fork), 
   - Go down to the "Actions" section,
   - Select "Allow all actions"
-- Edit one of the workflow files (located in .github\workflows) and edit the following entries (you can do this in GitHub):
+- Edit one of the workflow files (located in .github\workflows) and edit the following entries (you can do this in the GitHub file editor):
   - keyboard: ['4x4Tutorials']
   - keymap: ['base']
   - keyboard_config: ['single']
