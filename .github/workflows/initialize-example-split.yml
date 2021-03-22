@@ -31,7 +31,7 @@ jobs:
         compile_with: ['bluemicro_nrf52840']
         # this parameter controls the generation of a yml file you can copy to the .github/workflows folder to build the uf2.
         # uf2 generation is only usesul for nrf52840 boards.  nrf52832 controllers do not support uf2 uploading.
-        setup_build_yml: ['false']
+        setup_build_yml: [false]
 
     # you shouldn't need to edit anything below
     steps:
@@ -59,7 +59,7 @@ jobs:
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
       - name: create build workflow
-        if: ${{ matrix.setup_build_yml }}
+        if: ${{ matrix.setup_build_yml == true}}
         run: |
           cp .github/workflow-templates/build.yml build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           sed -i 's/ReplaceMeWithSketchName/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/' build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
