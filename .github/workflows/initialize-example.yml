@@ -29,6 +29,9 @@ jobs:
         # nice_nano
         # pca10056 - use this for all other nRF52840 based boards not listed above (needs Arduino_nRF52_Bootloader)
         compile_with: ['bluemicro_nrf52840']
+        # this parameter controls the generation of a yml file you can copy to the .github/workflows folder to build the uf2.
+        # uf2 generation is only usesul for nrf52840 boards.  nrf52832 controllers do not support uf2 uploading.
+        setup_build_yml: ['false']
 
     # you shouldn't need to edit anything below
     steps:
@@ -56,11 +59,13 @@ jobs:
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
       - name: create build workflow
+        if: ${{ matrix.setup_build_yml }}
         run: |
           cp .github/workflow-templates/build.yml build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           sed -i 's/ReplaceMeWithSketchName/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/' build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           sed -i 's/ReplaceMeWithCompileWith/${{ matrix.compile_with }}/' build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           ls -l ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
+          git add build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
       - name: remove BlueMicro_BLE repository
         run: |
           rm -r BlueMicro_BLE
@@ -69,7 +74,6 @@ jobs:
           ls -l
           git config --global user.name 'gh-actions'
           git config --global user.email 'gh-actions@noreply.github.com'
-          git add build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
           git add ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
           git commit -m "Initialized ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }} using GitHub Actions"
           git push
