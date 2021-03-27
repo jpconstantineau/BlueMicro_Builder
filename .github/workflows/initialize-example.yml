@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
           echo '::set-output name=firmware-exist::$([ -d "${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}" ] && echo "true")'
-          echo '::set-output name=firmware-here::true'
+          echo "::set-output name=firmware-here::$([ -d ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} ])"
       - name: clone BlueMicro_BLE repository
         if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
