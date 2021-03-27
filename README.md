@@ -14,7 +14,6 @@ Initializes and Builds your own BlueMicro_BLE firmware.
   - keyboard_config: ['single']
   - hardware_config: ['feather52832/4x4Backpack']
   - compile_with: ['4x4macropad_nrf52832']
-  - setup_build_yml: [false]
 - Go to "Actions" at the top of your repo
 - Select the workflow you just edited, you should see a "Run Workflow" menu to the right
 - Trigger Workflow.  This will run a GitHub Action to copy the necessary files from the BlueMicro_BLE firmware and copy over the keyboard and configuration files you have selected above.
