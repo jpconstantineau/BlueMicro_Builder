@@ -21,7 +21,7 @@ jobs:
         # keyboard configuration. Multiple configs can be setup following this example: ['left','right']
         keyboard_config: ['single']
         # hardware configuration. must have both components of the path in the BlueMicro_BLE keyboard examples path
-        hardware_config: ['feather52832/4x4Backpack']
+        hardware_config: ['4x4Backpack']
         # Available options
         # feather_nrf52832 - use this for most nRF52832 based boards (needs Arduino_nRF52_Bootloader)
         # bluemicro_nrf52840
@@ -30,7 +30,7 @@ jobs:
         # pca10056 - use this for all other nRF52840 based boards not listed above (needs Arduino_nRF52_Bootloader)
         compile_with: ['4x4macropad_nrf52832']
 
-        # you shouldn't need to edit anything below
+    # you shouldn't need to edit anything below
     steps:
       - name: checkout builder repo
         uses: actions/checkout@v2
@@ -38,42 +38,46 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN  }}
       - name: update from last run
         run: git pull
-      - name: setup job variables
-        id: job_variables
+      - name: setup conditions
+        id: job_conditions
         run: |
-          echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
           if [ -d ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} ]; then
           echo "::set-output name=firmware-here::true"
           else
           echo "::set-output name=firmware-here::false"
           fi
       - name: clone BlueMicro_BLE repository
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
+      - name: setup job variables
+        id: job_variables
+        run: |
+          echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
+          echo "::set-output name=hardware-config::$(find BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/ -name hardware_config.h | grep ${{ matrix.hardware_config }} )"
       - name: create firmware folder
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           mkdir ${{ steps.job_variables.outputs.firmware-name }}
       - name: copy main firmware files
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.outputs.firmware-name }}/${{ steps.job_variables.outputs.firmware-name }}.ino
       - name: copy board specific files
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.outputs.firmware-name }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.outputs.firmware-name }}
+          cp ${{ steps.job_variables.outputs.hardware-config }} ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.outputs.firmware-name }} 
       - name: remove BlueMicro_BLE repository
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           rm -r BlueMicro_BLE
       - name: check back in the changes to this repo
-        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
+        if: ${{ steps.job_conditions.outputs.firmware-here == 'false' }}
         run: |
           ls -l
           git config --global user.name 'gh-actions'
@@ -106,14 +110,19 @@ jobs:
           arduino-cli core install community_nrf52:nrf52 --additional-urls $BSP_URL
           arduino-cli core list
           arduino-cli board listall
-          # Install library dependencies
-          arduino-cli lib install   "Adafruit GFX Library"  "Adafruit NeoPixel"  "Adafruit SSD1306" 
           arduino-cli lib list
-      - name: Compile Sketch
+      - name: Compile Fimware
         env:
           BSP_PATH: .arduino15/packages/adafruit/hardware/nrf52
         run: |
           arduino-cli compile --fqbn community_nrf52:nrf52:${{ matrix.compile_with }}  ./${{ steps.job_variables.outputs.firmware-name }} --output-dir ./${{ steps.job_variables.outputs.firmware-name }}/build
+      - name: Create UF2 for nRF52840 boards
+        # nrf52832 boards don't support uf2 uploads.
+        # feather_nrf52832 or 4x4macropad_nrf52832 or bluemicro2_1
+        if: ${{ (matrix.compile_with != 'feather_nrf52832') && (matrix.compile_with != '4x4macropad_nrf52832') && (matrix.compile_with != 'bluemicro2_1') }}
+        env:
+          BSP_PATH: .arduino15/packages/adafruit/hardware/nrf52
+        run: |
           BSP_VERSION=`eval ls $HOME/$BSP_PATH`
           python $HOME/$BSP_PATH/$BSP_VERSION/tools/uf2conv/uf2conv.py ./${{ steps.job_variables.outputs.firmware-name }}/build/${{ steps.job_variables.outputs.firmware-name }}.ino.hex -c -f 0xADA52840 -o ./${{ steps.job_variables.outputs.firmware-name }}/build/${{ steps.job_variables.outputs.firmware-name }}.ino.uf2
       - name: Archive artifacts
