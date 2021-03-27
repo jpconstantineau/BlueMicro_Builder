@@ -42,6 +42,7 @@ jobs:
         id: job_variables
         run: |
           echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
+          echo '::set-output name=firmware-exist::$[ -d "${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}" ] && echo "true"'
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
@@ -108,6 +109,6 @@ jobs:
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: firmware
+          name: ${{ steps.job_variables.outputs.firmware-name }}
           path: |
             ${{ steps.job_variables.outputs.firmware-name }}/build
