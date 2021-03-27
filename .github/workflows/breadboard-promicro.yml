@@ -40,7 +40,7 @@ jobs:
         run: git pull
       - name: setup conditions
         id: job_conditions
-        run:|
+        run: |
           if [ -d ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} ]; then
           echo "::set-output name=firmware-here::true"
           else
