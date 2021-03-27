@@ -1,7 +1,7 @@
 # Use this workflow to initialize your repository with the fimware you need for your keyboard
 # if you have multiple keyboards, you need to have 1 copy of this file per keyboard
 # rename the name below so that you can see the different keyboards in your github actions
-name: initialize
+name: breadboard-promicro
 
 # You will need to manually trigger this workflow
 on:  ['workflow_dispatch']
@@ -29,9 +29,6 @@ jobs:
         # nice_nano
         # pca10056 - use this for all other nRF52840 based boards not listed above (needs Arduino_nRF52_Bootloader)
         compile_with: ['bluemicro_nrf52840']
-        # this parameter controls the generation of a yml file you can copy to the .github/workflows folder to build the uf2.
-        # uf2 generation is only usesul for nrf52840 boards.  nrf52832 controllers do not support uf2 uploading.
-        setup_build_yml: [true]
 
     # you shouldn't need to edit anything below
     steps:
@@ -41,31 +38,27 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN  }}
       - name: update from last run
         run: git pull
+      - name: setup job variables
+        id: job_variables
+        run: |
+          echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
       - name: create firmware folder
         run: |
-          mkdir ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
+          mkdir ${{ steps.job_variables.firmware-name }}
       - name: copy main firmware files
         run: |
-          cp BlueMicro_BLE/firmware/*.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/*.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/firmware.ino ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.ino
+          cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.firmware-name }}
+          cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.firmware-name }}
+          cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.firmware-name }}/${{ steps.job_variables.firmware-name }}.ino
       - name: copy board specific files
         run: |
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }} 
-      - name: create build workflow
-        if: ${{ matrix.setup_build_yml == true}}
-        run: |
-          cp .github/workflow-templates/build.yml build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
-          sed -i 's/ReplaceMeWithSketchName/${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}/' build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
-          sed -i 's/ReplaceMeWithCompileWith/${{ matrix.compile_with }}/' build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
-          ls -l ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          git add build-${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}.yml
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.firmware-name }} 
       - name: remove BlueMicro_BLE repository
         run: |
           rm -r BlueMicro_BLE
@@ -74,6 +67,47 @@ jobs:
           ls -l
           git config --global user.name 'gh-actions'
           git config --global user.email 'gh-actions@noreply.github.com'
-          git add ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}
-          git commit -m "Initialized ${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }} using GitHub Actions"
+          git add ${{ steps.job_variables.firmware-name }}
+          git commit -m "Initialized ${{ steps.job_variables.firmware-name }} using GitHub Actions"
           git push
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      # We use the arduino/setup-arduino-cli action to install and
+      # configure the Arduino CLI on the system.
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1.1.1
+        
+      - name: Install BSP and Libraries
+        env:
+          BSP_URL: https://github.com/jpconstantineau/Community_nRF52_Arduino/releases/latest/download/package_jpconstantineau_boards_index.json
+          BSP_PATH: .arduino15/packages/community_nrf52/hardware/nrf52
+          BSP_URL_ADA: https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+          BSP_PATH_ADA: .arduino15/packages/adafruit/hardware/nrf52
+        run: |
+          pip3 install adafruit-nrfutil
+          arduino-cli config init
+          arduino-cli core update-index
+          arduino-cli core update-index --additional-urls $BSP_URL_ADA
+          arduino-cli core install adafruit:nrf52 --additional-urls $BSP_URL_ADA
+          arduino-cli core update-index --additional-urls $BSP_URL
+          arduino-cli core install community_nrf52:nrf52 --additional-urls $BSP_URL
+          arduino-cli core list
+          arduino-cli board listall
+          # Install library dependencies
+          arduino-cli lib install   "Adafruit GFX Library"  "Adafruit NeoPixel"  "Adafruit SSD1306" 
+          arduino-cli lib list
+      - name: Compile Sketch
+        env:
+          BSP_PATH: .arduino15/packages/adafruit/hardware/nrf52
+        run: |
+          arduino-cli compile --fqbn community_nrf52:nrf52:${{ compile_with }}  ./${{ steps.job_variables.firmware-name }} --output-dir ./${{ steps.job_variables.firmware-name }}/build
+          BSP_VERSION=`eval ls $HOME/$BSP_PATH`
+          python $HOME/$BSP_PATH/$BSP_VERSION/tools/uf2conv/uf2conv.py ./${{ steps.job_variables.firmware-name }}/build/${{ steps.job_variables.firmware-name }}.ino.hex -c -f 0xADA52840 -o ./${{ steps.job_variables.firmware-name }}/build/${{ steps.job_variables.firmware-name }}.ino.uf2
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: |
+            ${{ steps.job_variables.firmware-name }}/build
