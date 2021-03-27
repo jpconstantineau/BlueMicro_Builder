@@ -47,7 +47,7 @@ jobs:
           else
           echo "::set-output name=firmware-here::false"
           fi
-          echo "::set-output name=hardware-config::$(find BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/ hardware_config.h | grep ${{ matrix.hardware_config }} )"
+          echo "::set-output name=hardware-config::$(find BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/ -name hardware_config.h | grep ${{ matrix.hardware_config }} )"
       - name: clone BlueMicro_BLE repository
         if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
