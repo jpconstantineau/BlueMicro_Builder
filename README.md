@@ -12,7 +12,7 @@ Initializes and Builds your own BlueMicro_BLE firmware.
   - keyboard: ['4x4Tutorials']
   - keymap: ['base']
   - keyboard_config: ['single']
-  - hardware_config: ['feather52832/4x4Backpack']
+  - hardware_config: ['4x4Backpack']
   - compile_with: ['4x4macropad_nrf52832']
 - Go to "Actions" at the top of your repo
 - Select the workflow you just edited, you should see a "Run Workflow" menu to the right
