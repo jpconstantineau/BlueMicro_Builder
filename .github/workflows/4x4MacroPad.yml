@@ -30,7 +30,7 @@ jobs:
         # pca10056 - use this for all other nRF52840 based boards not listed above (needs Arduino_nRF52_Bootloader)
         compile_with: ['4x4macropad_nrf52832']
 
-    # you shouldn't need to edit anything below
+        # you shouldn't need to edit anything below
     steps:
       - name: checkout builder repo
         uses: actions/checkout@v2
@@ -48,32 +48,32 @@ jobs:
           echo "::set-output name=firmware-here::false"
           fi
       - name: clone BlueMicro_BLE repository
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
       - name: create firmware folder
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           mkdir ${{ steps.job_variables.outputs.firmware-name }}
       - name: copy main firmware files
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.outputs.firmware-name }}/${{ steps.job_variables.outputs.firmware-name }}.ino
       - name: copy board specific files
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.outputs.firmware-name }} 
       - name: remove BlueMicro_BLE repository
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           rm -r BlueMicro_BLE
       - name: check back in the changes to this repo
-        if: ${{ steps.job_variables.outputs.firmware-here == false }}
+        if: ${{ steps.job_variables.outputs.firmware-here == 'false' }}
         run: |
           ls -l
           git config --global user.name 'gh-actions'
