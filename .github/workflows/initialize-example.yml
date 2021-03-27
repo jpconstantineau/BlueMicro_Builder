@@ -43,27 +43,34 @@ jobs:
         run: |
           echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
           echo '::set-output name=firmware-exist::$([ -d "${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}" ] && echo "true")'
+          echo '::set-output name=firmware-here::true'
       - name: clone BlueMicro_BLE repository
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
       - name: create firmware folder
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           mkdir ${{ steps.job_variables.outputs.firmware-name }}
       - name: copy main firmware files
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.outputs.firmware-name }}/${{ steps.job_variables.outputs.firmware-name }}.ino
       - name: copy board specific files
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.outputs.firmware-name }}
           cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.outputs.firmware-name }} 
       - name: remove BlueMicro_BLE repository
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           rm -r BlueMicro_BLE
       - name: check back in the changes to this repo
+        if: ${{ steps.job_variables.outputs.firmware-here != true }}
         run: |
           ls -l
           git config --global user.name 'gh-actions'
