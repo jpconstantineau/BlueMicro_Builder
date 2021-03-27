@@ -47,18 +47,18 @@ jobs:
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
       - name: create firmware folder
         run: |
-          mkdir ${{ steps.job_variables.firmware-name }}
+          mkdir ${{ steps.job_variables.outputs.firmware-name }}
       - name: copy main firmware files
         run: |
-          cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.firmware-name }}
-          cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.firmware-name }}
-          cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.firmware-name }}/${{ steps.job_variables.firmware-name }}.ino
+          cp BlueMicro_BLE/firmware/*.cpp ${{ steps.job_variables.outputs.firmware-name }}
+          cp BlueMicro_BLE/firmware/*.h ${{ steps.job_variables.outputs.firmware-name }}
+          cp BlueMicro_BLE/firmware/firmware.ino ${{ steps.job_variables.outputs.firmware-name }}/${{ steps.job_variables.outputs.firmware-name }}.ino
       - name: copy board specific files
         run: |
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.firmware-name }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.firmware-name }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.firmware-name }}
-          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.firmware-name }} 
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/config/${{ matrix.keyboard_config }}/keyboard_config.h ${{ steps.job_variables.outputs.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/hardware/${{ matrix.hardware_config }}/hardware_config.h ${{ steps.job_variables.outputs.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.h ${{ steps.job_variables.outputs.firmware-name }}
+          cp BlueMicro_BLE/firmware/keyboards/${{ matrix.keyboard }}/keymaps/${{ matrix.keymap }}/keymap.cpp ${{ steps.job_variables.outputs.firmware-name }} 
       - name: remove BlueMicro_BLE repository
         run: |
           rm -r BlueMicro_BLE
@@ -67,8 +67,8 @@ jobs:
           ls -l
           git config --global user.name 'gh-actions'
           git config --global user.email 'gh-actions@noreply.github.com'
-          git add ${{ steps.job_variables.firmware-name }}
-          git commit -m "Initialized ${{ steps.job_variables.firmware-name }} using GitHub Actions"
+          git add ${{ steps.job_variables.outputs.firmware-name }}
+          git commit -m "Initialized ${{ steps.job_variables.outputs.firmware-name }} using GitHub Actions"
           git push
       - name: Setup Python
         uses: actions/setup-python@v1
@@ -102,12 +102,12 @@ jobs:
         env:
           BSP_PATH: .arduino15/packages/adafruit/hardware/nrf52
         run: |
-          arduino-cli compile --fqbn community_nrf52:nrf52:${{ matrix.compile_with }}  ./${{ steps.job_variables.firmware-name }} --output-dir ./${{ steps.job_variables.firmware-name }}/build
+          arduino-cli compile --fqbn community_nrf52:nrf52:${{ matrix.compile_with }}  ./${{ steps.job_variables.outputs.firmware-name }} --output-dir ./${{ steps.job_variables.outputs.firmware-name }}/build
           BSP_VERSION=`eval ls $HOME/$BSP_PATH`
-          python $HOME/$BSP_PATH/$BSP_VERSION/tools/uf2conv/uf2conv.py ./${{ steps.job_variables.firmware-name }}/build/${{ steps.job_variables.firmware-name }}.ino.hex -c -f 0xADA52840 -o ./${{ steps.job_variables.firmware-name }}/build/${{ steps.job_variables.firmware-name }}.ino.uf2
+          python $HOME/$BSP_PATH/$BSP_VERSION/tools/uf2conv/uf2conv.py ./${{ steps.job_variables.outputs.firmware-name }}/build/${{ steps.job_variables.outputs.firmware-name }}.ino.hex -c -f 0xADA52840 -o ./${{ steps.job_variables.outputs.firmware-name }}/build/${{ steps.job_variables.outputs.firmware-name }}.ino.uf2
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
           name: firmware
           path: |
-            ${{ steps.job_variables.firmware-name }}/build
+            ${{ steps.job_variables.outputs.firmware-name }}/build
