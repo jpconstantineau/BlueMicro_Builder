@@ -42,7 +42,7 @@ jobs:
         id: job_variables
         run: |
           echo "::set-output name=firmware-name::${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}"
-          echo '::set-output name=firmware-exist::$[ -d "${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}" ] && echo "true"'
+          echo '::set-output name=firmware-exist::$([ -d "${{ matrix.keyboard }}-${{ matrix.keymap }}-${{ matrix.keyboard_config }}-${{ matrix.compile_with }}" ] && echo "true")'
       - name: clone BlueMicro_BLE repository
         run: |
           git clone https://github.com/jpconstantineau/BlueMicro_BLE.git
