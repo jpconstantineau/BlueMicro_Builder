@@ -23,12 +23,12 @@ jobs:
         # hardware configuration. must have both components of the path in the BlueMicro_BLE keyboard examples path
         hardware_config: ['bluemicrov2_1']
         # Available options
-        # feather_nrf52832 - use this for most nRF52832 based boards (needs Arduino_nRF52_Bootloader)
+        # feather52832 - use this for most nRF52832 based boards (needs Arduino_nRF52_Bootloader)
         # bluemicro_nrf52840
         # bluemacro_nrf52840
         # nice_nano
         # pca10056 - use this for all other nRF52840 based boards not listed above (needs Arduino_nRF52_Bootloader)
-        compile_with: ['feather_nrf52832']
+        compile_with: ['feather52832']
 
     # you shouldn't need to edit anything below
     steps:

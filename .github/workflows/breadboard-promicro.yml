@@ -23,7 +23,7 @@ jobs:
         # hardware configuration. 
         hardware_config: ['bluemicro840v1_0']
         # Available options
-        # feather_nrf52832     - use this for most nRF52832 based boards (needs Arduino_nRF52_Bootloader)
+        # feather52832     - use this for most nRF52832 based boards (needs Arduino_nRF52_Bootloader)
         # 4x4macropad_nrf52832 - use this for the 4x4Macropad by jpconstantineau
         # bluemicro2_1         - this is a nRF52832 feather compatible board
         # bluemicro_nrf52840
